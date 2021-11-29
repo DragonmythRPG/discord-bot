@@ -7,6 +7,6 @@ module.exports = {
     async execute(interaction) {
         await interaction.reply('Loading...')
             // .then(interaction.deleteReply())
-            .then(interaction.reply("Ping!"));
+            // .then(interaction.reply("Ping!"));
     },
 };

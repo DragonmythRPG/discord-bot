@@ -2,10 +2,14 @@
 // import { Client, Collection, Intents, Interaction, MessageEmbed } from "discord.js";
 // import * as token from "./config.json";
 
+const dotenv = require('dotenv');
+
+dotenv.config();
+
 // Require the necessary discord.js classes
 const fs = require('fs');
 const { Client, Collection, Intents, Interaction, MessageEmbed } = require('discord.js');
-const { token } = require('./config.json');
+// const { token } = require('./config.json');
 const debug = true;
 // const Discord = require('discord.js')
 
@@ -80,4 +84,4 @@ client.on("interactionCreate", async interaction => {
 });
 
 // Login to Discord with your client's token
-client.login(token);
+client.login(process.env.token);
