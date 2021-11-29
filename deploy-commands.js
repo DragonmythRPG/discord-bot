@@ -27,7 +27,7 @@ var registerCommands = function registerCommands() {
 
 module.exports.registerCommands = registerCommands;
 
-const rest = new REST({ version: '9' }).setToken(token);
+const rest = new REST({ version: '9' }).setToken(process.env.token);
 
 rest.put(Routes.applicationGuildCommands(process.env.clientId, process.env.guildId), { body: commands })
     .then(() => console.log('Successfully registered application commands.'))
