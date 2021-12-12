@@ -14,11 +14,17 @@ const debug = true;
 // const Discord = require('discord.js')
 
 // Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({
+    intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    ],
+});
 client.commands = new Collection();
 
-global.commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
-for (const file of global.commandFiles) {
+const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
+for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
     client.commands.set(command.data.name, command);
 }
@@ -45,7 +51,7 @@ client.once('ready', () => {
             opt = option;
             return option;
         })
-        for (const file of global.commandFiles) {
+        for (const file of commandFiles) {
             const command = require(`./commands/${file}`);
             opt.addChoice(command.data.name, command.data.description);
         }
