@@ -1,9 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const fs = require('fs');
 
-const data = new SlashCommandBuilder
-    .setName('whisper')
-    .setDescription('Only the users you select can hear you.')
+// const data = new SlashCommandBuilder
+//     .setName('whisper')
+//     .setDescription('Only the users you select can hear you.')
 
 
 module.exports = {

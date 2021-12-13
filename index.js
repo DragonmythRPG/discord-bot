@@ -8,15 +8,20 @@ dotenv.config();
 
 // Require the necessary discord.js classes
 const fs = require('fs');
-const { Client, Collection, Intents, Interaction, MessageEmbed } = require('discord.js');
-// const { token } = require('./config.json');
+const { Sequelize } = require('sequelize');
+const { Client, Collection, Intents, Formatters, Interaction, MessageEmbed } = require('discord.js');
 const debug = true;
-// const Discord = require('discord.js')
+
+const userDatabase = require("./initDatabase.js");
+const xp = new Collection();
+
+// console.log(users);
 
 // Create a new client instance
 const client = new Client({
     intents: [
         Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MEMBERS,
         Intents.FLAGS.GUILD_MESSAGES,
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
     ],
@@ -55,32 +60,24 @@ client.once('ready', () => {
             const command = require(`./commands/${file}`);
             opt.addChoice(command.data.name, command.data.description);
         }
-        console.log(opt)
         const deploy = require("./deploy-commands");
         deploy.registerCommands();
     }
+    userDatabase.runSequelize(client);
+    // const storedXP = users.findAll()
+    //     .then(obj => {
+    //         console.log(obj)
+    //         obj.forEach(x => xp.set(x.user_id, x));
+    //         console.log(obj)
+    //     });
+    console.log(xp);
     console.log('Ready!');
 });
 
 client.on("interactionCreate", async interaction => {
-    // if (interaction.commandName == "help") {
-    //     text = ''
-    //     commands.forEach(command => {
-    //         text += (`**${command.setName}**: \n ${command.setDescription} \n\n}`)
-    //     })
-    //     const embed = new MessageEmbed()
-    //         .setColor('#ff0000')
-    //         .setTitle('Help')
-    //         .setDescription(text)
-    //     await interaction.send(embed);
-    // }
-
     if (!interaction.isCommand()) return;
-
     const command = client.commands.get(interaction.commandName);
-
     if (!command) return;
-
     try {
         await command.execute(interaction);
     } catch (error) {
