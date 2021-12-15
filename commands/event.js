@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, Embed } = require('@discordjs/builders');
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed, MessageButton, MessageActionRow } = require("discord.js");
 
 const order = "dd-mm"
 
@@ -121,7 +121,7 @@ module.exports = {
         //     }));
         const prom = interaction.reply({ content: `${user.username} is creating an event...`, fetchReply: true });
         // let title = await getTitle();
-        let title = `Test Session`
+        let title = `Test Session`;
         console.log(title);
         if (!title) return false;
         // let description = await getDescription();
@@ -149,6 +149,9 @@ module.exports = {
         // description = str;
         let dateTime = new Date(date.year, date.month, date.day, time.hour - offset, time.minute).getTime() / 1000
         let attending = `\u200b`
+        const actRow = new MessageActionRow()
+            .addComponents(new MessageButton()
+                .setEmoji(`212e30e47232be03033a87dc58edaa95`))
 
         const finalEvent = {
             title: title,
@@ -180,7 +183,7 @@ module.exports = {
                 \`\`\``,
                 inline: true,
             }, {
-                name: `Unsure`,
+                name: `Unavailable`,
                 value: `\`\`\`
                 
                 
@@ -192,6 +195,7 @@ module.exports = {
                 url: `https://imgur.com/a/DEk1W1T`,
                 width: 1200,
             },
+            components: [actRow],
             // footer: `\u280b`.repeat(500),
         };
         console.log(finalEvent);
