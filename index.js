@@ -1,7 +1,3 @@
-// import * as fs from "fs";
-// import { Client, Collection, Intents, Interaction, MessageEmbed } from "discord.js";
-// import * as token from "./config.json";
-
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -11,10 +7,8 @@ const fs = require('fs');
 const { Sequelize } = require('sequelize');
 const { Client, Collection, Intents, Formatters, Interaction, MessageEmbed } = require('discord.js');
 
-// console.log(users);
-
 // Create a new client instance
-const client = new Client({
+client = new Client({
     intents: [
         Intents.FLAGS.DIRECT_MESSAGES,
         Intents.FLAGS.DIRECT_MESSAGE_TYPING,
@@ -34,17 +28,6 @@ const client = new Client({
     ],
 });
 client.commands = new Collection();
-
-const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
-for (const file of commandFiles) {
-    console.log(`File: ${file}`);
-    const command = require(`./commands/${file}`);
-    console.log("Command:");
-    console.log(command);
-    client.commands.set(command.data.name, command);
-}
-const help = require("./help.js");
-client.commands.set(help.data.name, help);
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {

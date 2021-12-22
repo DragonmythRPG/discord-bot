@@ -8,6 +8,6 @@ module.exports = {
         await interaction.reply('Loading...')
             .then(interaction.channel.send(`Latency is ${Date.now() - interaction.createdTimestamp}ms.`))
             .then(interaction.deleteReply())
-            .then(interaction.folloup("Ping!"));
+            .then(interaction.followUp("Ping!"));
     },
 };

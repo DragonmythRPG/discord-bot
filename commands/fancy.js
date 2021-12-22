@@ -46,9 +46,12 @@ module.exports = {
 
         const msg = interaction.options.getString(`msg`);
         const msgArr = msg.toLowerCase().split(``);
-        const newMsg = [scrolls.start]
+        const newMsg = [scrolls.start];
+        let i = 0;
         msgArr.forEach(char => {
             let emoji = scrolls[char];
+            // console.log(msg.charCodeAt(i))
+            // i++
             if (char == " ") emoji = scrolls.space;
             if (emoji) {
                 console.log(emoji);
@@ -62,8 +65,5 @@ module.exports = {
 
 
         interaction.channel.send(newMsg.join(``));
-        // .then(interaction.deleteReply())
-        // .then(interaction.reply("Ping!"));
-        async function fancy() {}
     },
 };

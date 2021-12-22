@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, Embed } = require('@discordjs/builders');
 const { MessageEmbed, MessageButton, MessageActionRow } = require("discord.js");
+const utility = require('../utility');
 
 const order = "dd-mm"
 
@@ -45,15 +46,6 @@ const timeFormats = [{
     reg: /^[0-9]+[: ]*[A-Za-z]{2}?$/,
     value: "test"
 }];
-
-let dateFormatList = {
-    name: "Date Formats:",
-    value: ""
-};
-dateFormats.forEach(format => {
-    dateFormatList.value = `${dateFormatList.value}
-    ${format.name}`
-})
 
 const titleEmbed = {
     title: "Title",
@@ -114,6 +106,7 @@ module.exports = {
         const filter = msg => interaction.user.id == msg.author.id;
         const user = interaction.user;
         const channel = await user.createDM();
+        const buttons = interaction.client.buttons;
         // interaction.guild.roles.fetch() //.then(roles => console.log(roles.values()))
         //     .then(roles => roles.forEach(role => {
         //         console.log(role.name);
@@ -129,7 +122,7 @@ module.exports = {
         console.log(description);
         if (!description) return false;
         // let date = await getDate();
-        let date = { year: 2021, month: 11, day: 15 }
+        let date = { year: 2021, month: 11, day: 20 }
         console.log(date);
         if (!date) return false;
         // let time = await getTime();
@@ -139,19 +132,26 @@ module.exports = {
         // let offset = await getOffset();
         let offset = 2;
         console.log(offset);
-        let group = await interaction.guild.roles.fetch(`891262046883151882`);
-        let str = ``;
-        group.members.forEach(member => {
-            str = `${str}<@!${member.id}>
-            `;
-        });
-        console.log(str);
-        // description = str;
+        let str = `\u200b`;
+        let groups = await getGroups()
+            // .then(group => {
+            //     group.members.forEach(member => {
+            //         str = `${str}<@!${member.id}>
+            //         `;
+            //     });
+            // });
+            // let groups = await interaction.guild.roles.fetch(`922242933325959200`);
+            // group.members.forEach(member => {
+            //     str = `${str}<@!${member.id}>
+            //     `;
+            // });
+            // description = str;
         let dateTime = new Date(date.year, date.month, date.day, time.hour - offset, time.minute).getTime() / 1000
-        let attending = `\u200b`
+        let attending = `\u200b`;
         const actRow = new MessageActionRow()
-            .addComponents(new MessageButton()
-                .setEmoji(`212e30e47232be03033a87dc58edaa95`))
+            .addComponents(buttons.get(`attending`))
+            .addComponents(buttons.get(`sitting`))
+            .addComponents(buttons.get(`unavailable`));
 
         const finalEvent = {
             title: title,
@@ -163,45 +163,28 @@ module.exports = {
                 <t:${dateTime}:R>`,
                 inline: false,
             }, {
-                name: `Waiting for Selection`,
+                name: `Unsure`,
                 value: str,
                 inline: false,
             }, {
                 name: `Attending`,
-                value: `\`\`\`
-                
-
-
-                \`\`\``,
+                value: `\u200b`,
                 inline: true,
             }, {
                 name: `Sitting Out`,
-                value: `\`\`\`
-                
-                
-                
-                \`\`\``,
+                value: `\u200b`,
                 inline: true,
             }, {
                 name: `Unavailable`,
-                value: `\`\`\`
-                
-                
-                
-                \`\`\``,
+                value: `\u200b`,
                 inline: true,
             }],
-            image: {
-                url: `https://imgur.com/a/DEk1W1T`,
-                width: 1200,
-            },
-            components: [actRow],
-            // footer: `\u280b`.repeat(500),
+            image: { url: `https://i.imgur.com/U8ckyoI.png` },
         };
         console.log(finalEvent);
         prom.then(msg => msg.delete());
         // user.send({ embeds: [finalEvent] });
-        const message = await interaction.channel.send({ embeds: [finalEvent] });
+        const message = await interaction.channel.send({ embeds: [finalEvent], components: [actRow] });
         console.log(message);
 
         async function getResponse() {
@@ -226,66 +209,63 @@ module.exports = {
             return response;
         }
 
-        async function getDate(bool) {
+        async function getDate(bool = false) {
             if (bool) { user.send({ embeds: [formatFail] }); } else { user.send({ embeds: [dateEmbed] }); }
             const response = await getResponse();
             if (!response) return false;
-            let formatted;
-            dateFormats.forEach(format => {
-                if (format.reg.test(response)) formatted = format;
-            });
-            console.log(formatted);
-            if (!formatted) return getDate(true);
-            let final = {}
-            const a = formatted.name.split("-");
-            const b = response.split(/[-,. \/]+/);
-            console.log(a);
-            console.log(b);
-            for (let i = 0; i < a.length; i++) {
-                let str = a[i];
-                switch (true) {
-                    case /^d+/.test(str):
-                        final.day = parseInt(b[i]);
-                        break;
-                    case /^m+/.test(str):
-                        final.month = parseInt(b[i]);
-                        break;
-                    case /^y+/.test(str):
-                        final.year = parseInt(b[i]);
-                        break;
-                    case /^M+/.test(str):
-                        final.month = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(b[i].substring(0, 3).toLowerCase());
-                        break;
-                }
-            }
-            return final;
+            // let formatted;
+            // dateFormats.forEach(format => {
+            //     if (format.reg.test(response)) formatted = format;
+            // });
+            // if (!formatted) return getDate(true);
+            // let final = {}
+            // const a = formatted.name.split("-");
+            // const b = response.split(/[-,. \/]+/);
+            // for (let i = 0; i < a.length; i++) {
+            //     let str = a[i];
+            //     switch (true) {
+            //         case /^d+/.test(str):
+            //             final.day = parseInt(b[i]);
+            //             break;
+            //         case /^m+/.test(str):
+            //             final.month = parseInt(b[i]);
+            //             break;
+            //         case /^y+/.test(str):
+            //             final.year = parseInt(b[i]);
+            //             break;
+            //         case /^M+/.test(str):
+            //             final.month = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(b[i].substring(0, 3).toLowerCase());
+            //             break;
+            //     }
+            // }
+            return utility.getDate(response);
         }
 
         async function getTime(bool) {
             if (bool) { user.send({ embeds: [formatFail] }); } else { user.send({ embeds: [timeEmbed] }); }
             const response = await getResponse();
             if (!response) return false;
-            let formatted;
-            timeFormats.forEach(format => {
-                if (format.reg.test(response)) formatted = true;
-            });
-            if (!formatted) return getTime(true);
-            let d = response.match(/[A-Za-z]{2}/);
-            let pm = 0;
-            if (d && d[0].toLowerCase() == "pm") pm = 12;
-            // const c = response.match(/[0-9]{2}[: ]*[0-9]{2}/)
-            // const pmReg = ;
-            let t = response.replaceAll(/[A-Za-z: ]/ig, "");
-            console.log(d);
-            console.log(t);
-            while (t.length < 4) {
-                t = `0${t}`
-            }
-            let final = {
-                hour: parseInt(t.substring(0, 2)) + pm,
-                minute: parseInt(t.substring(2, 4))
-            };
-            return final;
+            // let formatted;
+            // timeFormats.forEach(format => {
+            //     if (format.reg.test(response)) formatted = true;
+            // });
+            // if (!formatted) return getTime(true);
+            // let d = response.match(/[A-Za-z]{2}/);
+            // let pm = 0;
+            // if (d && d[0].toLowerCase() == "pm") pm = 12;
+            // // const c = response.match(/[0-9]{2}[: ]*[0-9]{2}/)
+            // // const pmReg = ;
+            // let t = response.replaceAll(/[A-Za-z: ]/ig, "");
+            // console.log(d);
+            // console.log(t);
+            // while (t.length < 4) {
+            //     t = `0${t}`
+            // }
+            // let final = {
+            //     hour: parseInt(t.substring(0, 2)) + pm,
+            //     minute: parseInt(t.substring(2, 4))
+            // };
+            return utility.getTime(response);
         }
 
         async function getOffset(bool) {
@@ -297,6 +277,51 @@ module.exports = {
             console.log(fl);
 
             return Math.round(fl * 60);
+        }
+
+        async function getGroups() {
+            console.log(interaction.guild.id);
+            const roles = await interaction.guild.roles.fetch()
+            const roleList = [];
+            const groups = [];
+            for (const role of roles.values()) {
+                groups.push(role.name);
+            }
+            // for (const res of responseArr) {
+            //     groups.push(matching.closestMatch(res, roleList));
+            // }
+            console.log(roleList);
+            console.log(groups);
+            // return groups;
+            let str = ``;
+            let n = 97;
+            for (const group of groups) {
+                let char = String.fromCharCode(n);
+                if (n > 122) continue;
+                n++;
+                str = `
+                ${str}
+                :regional_indicator_${char}: ${group}`;
+            }
+            if (!str) str = `\u200b`;
+            const groupsEmbed = {
+                title: "Which groups would you like to include?",
+                description: str,
+                fields: [{
+                    name: `Chosen Groups`,
+                    value: `\`\`\`
+                    
+                    \`\`\``,
+                    inline: false,
+                }],
+                footer: {
+                    text: `Guild ID: ${interaction.guild.id}`,
+                },
+            }
+            const actGroups = new MessageActionRow()
+                .addComponents(buttons.get(`addGroup`))
+                .addComponents(buttons.get(`finishGroups`));
+            user.send({ embeds: [groupsEmbed], components: [actGroups] });
         }
 
         // const date = new Date(str[0],str[1],str[2])

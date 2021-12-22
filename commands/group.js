@@ -3,7 +3,7 @@ const { Collection } = require('discord.js');
 const fs = require('fs');
 
 const data = new SlashCommandBuilder()
-    .setName('experience')
+    .setName('group')
     .setDescription('Experience Commands');
 
 const subcommands = new Collection()
@@ -15,8 +15,6 @@ function getData() {
         data.addSubcommand(sub => sub = subcommand.data);
         subcommands.set(subcommand.data.name, subcommand);
     }
-    data.type = `CHAT_INPUT`;
-    console.log(data);
     return data;
 }
 
