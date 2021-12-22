@@ -71,10 +71,10 @@ module.exports = {
         const filter = msg => interaction.user.id == msg.author.id;
         const user = interaction.user;
         const channel = await user.createDM();
-        interaction.reply({ content: `Sent you a direct message.`, ephemeral: true })
-            // interaction.reply({ embeds: [finalEmbed] })
+        // interaction.reply({ content: `Sent you a direct message.`, ephemeral: true });
+        interaction.reply({ embeds: [finalEmbed] });
 
-        await user.send({ embeds: [availableMenu], components: [actRow] });
+        // await user.send({ embeds: [availableMenu], components: [actRow] });
         // await interaction.reply({ embeds: [finalEmbed] });
 
         async function getResponse() {

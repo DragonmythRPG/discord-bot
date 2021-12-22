@@ -58,7 +58,7 @@ module.exports = {
                 newMsg.push(emoji);
             } else {
                 console.log(char);
-                newMsg.push(char)
+                newMsg.push(char);
             }
         });
         newMsg.push(scrolls.end);
