@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const { Collection } = require(`discord.js`);
 const commands = require("./initCommands.js");
+const { time } = require('@discordjs/builders');
 // const { REST } = require('@discordjs/rest');
 // const { Routes } = require('discord-api-types/v9');
 
@@ -15,6 +16,7 @@ const sequelize = new Sequelize('database', 'user', 'password', {
 
 const User = require("./models/users.js")(sequelize, Sequelize.DataTypes);
 const Group = require("./models/groups.js")(sequelize, Sequelize.DataTypes);
+const Time = require("./models/times.js")(sequelize, Sequelize.DataTypes);
 
 async function runSequelize() {
     try {
@@ -41,6 +43,15 @@ async function runSequelize() {
     }).then(async function() {
         await commands.registerCommands();
         // console.log(client);
+    });
+    Time.sync().then(async function() {
+        const times = await Time.findAll();
+        client.databases.times = new Collection();
+        console.log(client.databases)
+        for (const time of times) {
+            if (time.players == null) await time.destroy();
+            client.databases.times.set(time.name, { name: time.name, startTime: time.startTime, endTime: time.endTime });
+        }
     });
     // console.log(client);
     // User.sync({ alter: true }).then(async function() {
@@ -74,6 +85,6 @@ async function updateGroup(group) {
     Group.upsert(client.databases.groups.get(group));
 }
 
-module.exports = { runSequelize, updateUser, updateGroup, User, Group }
+module.exports = { runSequelize, updateUser, updateGroup, User, Group, Time }
 
 // module.exports = { users };
