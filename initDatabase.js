@@ -25,7 +25,7 @@ async function runSequelize() {
     } catch (error) {
         console.error('Unable to connect to the database:', error);
     }
-    Group.sync().then(async function() {
+    const promiseGroup = Group.sync().then(async function() {
         const groups = await Group.findAll();
         client.databases.groups = new Collection();
         for (const group of groups) {
@@ -36,18 +36,15 @@ async function runSequelize() {
             client.databases.groups.set(group.name, { name: group.name, players: players });
         }
     });
-    User.sync().then(async function() {
+    const promiseUser = User.sync().then(async function() {
         const users = await User.findAll();
         client.databases.users = new Collection();
         for (const user of users) {
             if (!user.userID || !user.userName) await user.destroy();
             client.databases.users.set(user.userID, { userID: user.userID, userName: user.userName, userXP: user.userXP });
         }
-    }).then(async function() {
-        await commands.registerCommands();
-        // console.log(client);
     });
-    Time.sync().then(async function() {
+    const promiseTime = Time.sync().then(async function() {
         const times = await Time.findAll();
         client.databases.times = new Collection();
         console.log(client.databases)
@@ -56,28 +53,10 @@ async function runSequelize() {
             client.databases.times.set(time.name, { name: time.name, startTime: time.startTime, endTime: time.endTime });
         }
     });
-    // console.log(client);
-    // User.sync({ alter: true }).then(async function() {
-    //     // createMembers(client).then(async function() {
-    //     //     const users = await User.findAll();
-    //     //     console.log(JSON.stringify(users, null, 2));
-    //     //     users.forEach(user => {
-    //     //         client.databases.experience.set(user.userID, user);
-    //     //     });
-    //     // })
-
-
-    //     async function createMembers(client) {
-    //         const guilds = await client.guilds.fetch();
-    //         for (let guild of guilds.values()) {
-    //             guild = await guild.fetch(guild.id);
-    //             const members = await guild.members.fetch();
-    //             for (const member of members.values()) {
-    //                 User.create({ userID: member.user.id, userName: member.user.username, userXP: 0 });
-    //             }
-    //         }
-    //     }
-    // });
+    Promise.all([promiseGroup, promiseUser, promiseTime]).then(async function() {
+        await commands.registerCommands();
+        // console.log(client);
+    });
 }
 
 async function updateUser(client, target) {
