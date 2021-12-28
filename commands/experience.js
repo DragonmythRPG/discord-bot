@@ -15,8 +15,6 @@ function getData() {
         data.addSubcommand(sub => sub = subcommand.data);
         subcommands.set(subcommand.data.name, subcommand);
     }
-    data.type = `CHAT_INPUT`;
-    console.log(data);
     return data;
 }
 

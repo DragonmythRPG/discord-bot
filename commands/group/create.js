@@ -28,17 +28,14 @@ module.exports = {
             }
         }
         if (taken) return false;
-        await database.set(group, { name: group, players: `` });
-        userDatabase.Group.upsert(client.databases.groups.get(group));
-        console.log(`About to start.`);
-        // const commands = await client.application.commands.fetch();
-        console.log(interaction.guild.commands);
-        const commands = await interaction.guild.commands.fetch();
-        // const commands = initCommands.appCommands;
-        console.log(commands);
-        console.log(`Starting this portion.`);
-        let appComArr = [];
-        for (const command of commands.values()) {
+        await database.set(group, { name: group, players: [] });
+        const upload = client.databases.groups.get(group);
+        console.log(upload);
+        upload.players = upload.players.join(`;`)
+        console.log(upload);
+        userDatabase.Group.upsert(upload);
+
+        for (const command of client.appCommands.values()) {
             for (const opt of command.options) {
                 if (!opt.options) continue;
                 for (const choice of opt.options) {
@@ -46,14 +43,9 @@ module.exports = {
                     choice.choices.push({ name: group, value: group });
                 }
             }
-            appComArr.push(command);
         }
-        console.log(appComArr);
-        console.log(`Setting the Commands`);
-        await interaction.guild.commands.set(appComArr);
-        console.log(`Setting the Global`);
-        await client.application.commands.set([]);
-        initCommands.appCommands = await interaction.guild.commands.fetch();
+        console.log(client.appCommands.toJSON());
+        await interaction.guild.commands.set(client.appCommands.toJSON());
         interaction.editReply(`Created ${group} and added it to the database.`);
     },
 };
