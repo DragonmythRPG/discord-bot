@@ -28,7 +28,10 @@ async function runSequelize() {
         client.databases.groups = new Collection();
         for (const group of groups) {
             if (group.players == null) await group.destroy();
-            client.databases.groups.set(group.name, { name: group.name, players: group.players.split(`;`) });
+            console.log(group.players.split(`;`));
+            const players = (group.players.split(`;`)[0] == ``) ? [] : group.players.split(`;`);
+            console.log(players);
+            client.databases.groups.set(group.name, { name: group.name, players: players });
         }
     });
     User.sync().then(async function() {

@@ -28,8 +28,12 @@ module.exports = {
             }
         }
         if (taken) return false;
-        await database.set(group, { name: group, players: `` });
-        userDatabase.Group.upsert(client.databases.groups.get(group));
+        await database.set(group, { name: group, players: [] });
+        const upload = client.databases.groups.get(group);
+        console.log(upload);
+        upload.players = upload.players.join(`;`)
+        console.log(upload);
+        userDatabase.Group.upsert(upload);
 
         for (const command of client.appCommands.values()) {
             for (const opt of command.options) {

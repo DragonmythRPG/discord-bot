@@ -6,27 +6,39 @@ const data = new SlashCommandSubcommandBuilder()
     .setDescription('Remove a member to a group.')
     .addStringOption(option =>
         option.setName(`group`)
-        .setDescription(`Choose the group you wish to remove from.`)
+        .setDescription(`Choose the group you wish to remove a user from.`)
         .setRequired(true))
-    .addUserOption(option => option.setName(`user`).setDescription(`Select the user you wish to remove.`).setRequired(true));
+    .addUserOption(option =>
+        option.setName(`user`)
+        .setDescription(`Choose the user you wish to remove from the group.`)
+        .setRequired(true));
 
 module.exports = {
     data: getData(),
     async execute(interaction) {
-        // const user = interaction.options.getUser(`user`);
-        // const target = (user) ? user : interaction.user;
-        // const database = interaction.client.databases.experience;
-        // const value = interaction.options.getNumber(`value`);
-        // let data = database.get(target.id);
-        // if (data) {
-        //     data.userXP += value;
-        //     database.set(target.id, data);
-        // } else {
-        //     database.set(target.id, { userID: target.id, userName: target.username, userXP: value })
-        //     data = database.get(target.id);
-        // }
-        // userDatabase.updateDatabase(interaction.client, target);
-        // interaction.reply(`Added ${value} XP to <@!${target.id}>. They now have ${database.get(target.id).userXP} XP.`);
+        // Defer reply and gather data for the following code.
+        await interaction.deferReply();
+        const group = interaction.options.getString(`group`);
+        const user = interaction.options.getUser(`user`);
+        const database = interaction.client.databases.groups;
+        const info = database.get(group);
+
+        // Check to see if user is already in group, then set response appropriately.
+        const reply = (info.players.includes(user.id)) ? `<@!${user.id}> has been removed from ${group}.` : `<@!${user.id}> isn't in ${group}.`
+
+        // Make sure the user is in the group, then remove them and upload to the database.
+        if (info.players.includes(user.id)) {
+            const index = info.players.indexOf(user.id);
+            info.players.splice(index, 1)
+            await database.set(group, info);
+            const newInfo = info
+            newInfo.players = newInfo.players.join(`;`);
+            userDatabase.Group.upsert(info);
+        }
+        console.log(client.databases.groups);
+
+        // Edit earlier deferment.
+        interaction.editReply(reply);
     },
 };
 
@@ -34,5 +46,8 @@ function getData() {
     for (const group of client.databases.groups.values()) {
         data.options[0].addChoice(group.name, group.name);
     }
+    // for (const user of client.databases.groups.values()) {
+    //     data.options[0].addChoice(group.name, group.name);
+    // }
     return data;
 }
