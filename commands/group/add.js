@@ -27,7 +27,7 @@ module.exports = {
         if (!info.players.includes(user.id)) {
             info.players.push(user.id);
             await database.set(group, info);
-            info.players = info.players.join(`;`);
+            info.players = info.players.join(`;`); // Currently breaks array in info.players. Requires fixing.
             userDatabase.Group.upsert(info);
         }
 

@@ -21,28 +21,52 @@ module.exports = {
                 name: group
             }
         });
-        client.application.commands.fetch().then(com => console.log(com));
-        interaction.guild.commands.fetch()
-            .then(commands => {
-                console.log(`Starting this portion.`);
-                let appComArr = [];
-                for (const command of commands.values()) {
-                    for (const opt of command.options) {
-                        if (!opt.options) continue;
-                        for (const choice of opt.options) {
-                            if (choice.name != `group`) continue;
-                            let i = 0;
-                            for (const g of choice.choices) {
-                                if (g.name == group) choice.choices.splice(i, 1);
-                                i++;
-                            }
-                            console.log(choice);
-                        }
+
+        // client.application.commands.fetch().then(com => console.log(com));
+        // interaction.guild.commands.fetch()
+        //     .then(commands => {
+        //         let appComArr = [];
+        //         for (const command of commands.values()) {
+        //             for (const opt of command.options) {
+        //                 console.log(`Getting ${opt.name} options now.`);
+        //                 if (!opt.options) continue;
+        //                 for (const choice of opt.options) {
+        //                     console.log(`Getting ${choice.name} choices now.`);
+        //                     if (choice.name != `group`) continue;
+        //                     let i = 0;
+        //                     for (const g of choice.choices) {
+        //                         if (g.name == group) choice.choices.splice(i, 1);
+        //                         i++;
+        //                     }
+        //                     console.log(choice);
+        //                 }
+        //             }
+        //             console.log(`Pushing now.`);
+        //             appComArr.push(command);
+        //         }
+        //         console.log(`Setting now.`);
+        //         interaction.guild.commands.set(appComArr);
+        //     }).then(interaction.editReply(`Deleted ${group} out of the database.`));
+
+        for (const command of client.appCommands.values()) {
+            for (const opt of command.options) {
+                if (!opt.options) continue;
+                for (const choice of opt.options) {
+                    if (choice.name != `group`) continue;
+                    let i = 0;
+                    for (const g of choice.choices) {
+                        if (g.name == group) choice.choices.splice(i, 1);
+                        i++;
                     }
-                    appComArr.push(command);
+                    console.log(command);
+                    console.log(choice);
+                    // choice.choices.push({ name: group, value: group });
                 }
-                interaction.guild.commands.set(appComArr);
-            }).then(interaction.editReply(`Deleted ${group} out of the database.`));
+            }
+        }
+        console.log(client.appCommands.toJSON());
+        await interaction.guild.commands.set(client.appCommands.toJSON());
+        interaction.editReply(`Created ${group} and added it to the database.`);
     },
 };
 
