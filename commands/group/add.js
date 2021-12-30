@@ -1,6 +1,7 @@
 const { SlashCommandSubcommandBuilder } = require('@discordjs/builders');
 const userDatabase = require("../../initDatabase.js");
 
+// Build initial slash command to add choices to in getData().
 const data = new SlashCommandSubcommandBuilder()
     .setName('add')
     .setDescription('Add a member to a group.')
@@ -21,14 +22,13 @@ module.exports = {
         const info = database.get(group);
 
         // Check to see if user is already in group, then set response appropriately.
-        const reply = (info.players.includes(user.id)) ? `<@!${user.id}> already belongs to ${group}.` : `Added <@!${user.id}> to ${group}.`
+        const reply = (info.players.includes(user.id)) ? `${user.username} already belongs to ${group}.` : `Added ${user.username} to ${group}.`
 
         // Make sure the user is not in the group, then upload to the database.
         if (!info.players.includes(user.id)) {
             info.players.push(user.id);
             await database.set(group, info);
-            info.players = info.players.join(`;`); // Currently breaks array in info.players. Requires fixing.
-            userDatabase.Group.upsert(info);
+            userDatabase.Group.upsert({ name: info.name, players: info.players.join(`;`) });
         }
 
         // Edit earlier deferment.
@@ -36,19 +36,11 @@ module.exports = {
     },
 };
 
+// Add all groups to the option choices.
 function getData() {
     for (const group of client.databases.groups.values()) {
         data.options[0].addChoice(group.name, group.name);
         console.log(group.name);
     }
     return data;
-}
-
-async function updateGroup(group, user) {
-    const database = client.databases.groups;
-    const info = database.get(group);
-    info.players.push(user.id);
-    await database.set(group, info);
-    info.players = info.players.join(`;`);
-    userDatabase.Group.upsert(info);
 }

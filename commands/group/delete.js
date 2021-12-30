@@ -60,6 +60,7 @@ module.exports = {
                     }
                     console.log(command);
                     console.log(choice);
+                    choice.choices.sort();
                     // choice.choices.push({ name: group, value: group });
                 }
             }

@@ -24,16 +24,14 @@ module.exports = {
         const info = database.get(group);
 
         // Check to see if user is already in group, then set response appropriately.
-        const reply = (info.players.includes(user.id)) ? `<@!${user.id}> has been removed from ${group}.` : `<@!${user.id}> isn't in ${group}.`
+        const reply = (info.players.includes(user.id)) ? `${user.username} has been removed from ${group}.` : `${user.username} isn't in ${group}.`
 
         // Make sure the user is in the group, then remove them and upload to the database.
         if (info.players.includes(user.id)) {
             const index = info.players.indexOf(user.id);
             info.players.splice(index, 1)
             await database.set(group, info);
-            const newInfo = info
-            newInfo.players = newInfo.players.join(`;`);
-            userDatabase.Group.upsert(info);
+            userDatabase.Group.upsert({ name: info.name, players: info.players.join(`;`) });
         }
         console.log(client.databases.groups);
 

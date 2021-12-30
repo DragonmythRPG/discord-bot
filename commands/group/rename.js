@@ -1,39 +1,39 @@
 const { SlashCommandSubcommandBuilder } = require('@discordjs/builders');
 const userDatabase = require("../../initDatabase.js");
-const initCommands = require("../../initCommands.js");
-
-const dotenv = require('dotenv');
-
-dotenv.config();
 
 const data = new SlashCommandSubcommandBuilder()
-    .setName('create')
-    .setDescription('Create a group.')
+    .setName('rename')
+    .setDescription('Rename a group.')
+    .addStringOption(option =>
+        option.setName(`group`)
+        .setDescription(`Choose the group you wish to rename.`)
+        .setRequired(true))
     .addStringOption(option =>
         option.setName(`name`)
-        .setDescription(`Choose the name of the group.`)
+        .setDescription(`Choose a new name for the group.`)
         .setRequired(true));
 
 module.exports = {
-    data: data,
+    data: getData(),
     async execute(interaction) {
         await interaction.deferReply();
-        const group = interaction.options.getString(`name`);
+        console.log(`Executing`);
+        const group = interaction.options.getString(`group`);
+        const name = interaction.options.getString(`name`);
         const database = interaction.client.databases.groups;
-        let taken = false;
-        for (const val of database.values()) {
-            if (val.name == group) {
-                taken = true;
-                interaction.reply({ content: `This group name is already taken. Please attempt again with a different name.`, ephemeral: true })
+        const getDatabase = database.get(group);
+        console.log(getDatabase);
+        database.set(name, { name: name, players: getDatabase.players })
+        console.log(database.get(name));
+        database.delete(group)
+        console.log(database);
+        await userDatabase.Group.update({
+            name: name,
+        }, {
+            where: {
+                name: group
             }
-        }
-        if (taken) return false;
-        await database.set(group, { name: group, players: [] });
-        const upload = client.databases.groups.get(group);
-        console.log(upload);
-        upload.players = upload.players.join(`;`);
-        console.log(upload);
-        userDatabase.Group.upsert(upload);
+        });
 
         // interaction.guild.commands.fetch()
         //     .then(commands => {
@@ -62,13 +62,27 @@ module.exports = {
                     if (!Array.isArray(choice.choices)) choice.choices = [];
                     console.log(command);
                     console.log(choice);
-                    choice.choices.push({ name: group, value: group });
+                    let i = 0;
+                    for (const g of choice.choices) {
+                        console.log(`i`);
+                        console.log(i);
+                        if (g.name == group) choice.choices.splice(i, 1);
+                        i++;
+                    }
+                    choice.choices.push({ name: name, value: name });
                     choice.choices.sort();
                 }
             }
         }
         console.log(client.appCommands.toJSON());
         await interaction.guild.commands.set(client.appCommands.toJSON());
-        interaction.editReply(`Created ${group} and added it to the database.`);
+        interaction.editReply(`Renamed ${group} to ${name}.`);
     },
 };
+
+function getData() {
+    for (const group of client.databases.groups.values()) {
+        data.options[0].addChoice(group.name, group.name);
+    }
+    return data;
+}
