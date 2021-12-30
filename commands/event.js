@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, Embed } = require('@discordjs/builders');
 const { MessageEmbed, MessageButton, MessageActionRow } = require("discord.js");
 const utility = require('../utility');
+const emojies = require('../utilities/emojies.js');
 
 const order = "dd-mm"
 
@@ -103,7 +104,6 @@ module.exports = {
         .setName("event")
         .setDescription('Create an event.'),
     async execute(interaction) {
-        const filter = msg => interaction.user.id == msg.author.id;
         const user = interaction.user;
         const channel = await user.createDM();
         const buttons = interaction.client.buttons;
@@ -184,14 +184,24 @@ module.exports = {
         console.log(finalEvent);
         prom.then(msg => msg.delete());
         // user.send({ embeds: [finalEvent] });
-        const message = await interaction.channel.send({ embeds: [finalEvent], components: [actRow] });
-        console.log(message);
+        // const message = await interaction.channel.send({ embeds: [finalEvent], components: [actRow] });
 
         async function getResponse() {
+            const filter = msg => interaction.user.id == msg.author.id;
             const response = await channel.awaitMessages({ filter, max: 1, time: 900000 });
             if (response.at(0)) return response.at(0).content;
             user.send({ embeds: [timeout] });
             return false;
+        }
+
+        async function getReaction(msg, limit) {
+            const filter = (reaction, user) => true;
+            const response = await msg.awaitReactions({ filter, max: limit, time: 900000 });
+            console.log(response);
+            return response;
+            // if (response.at(0)) return response.at(0).content;
+            // user.send({ embeds: [timeout] });
+            // return false;
         }
 
         async function getTitle() {
@@ -280,13 +290,16 @@ module.exports = {
         }
 
         async function getGroups() {
+            // Defer reply and gather data for the following code.
+            const groups = client.databases.groups.values();
+
             console.log(interaction.guild.id);
             const roles = await interaction.guild.roles.fetch()
             const roleList = [];
-            const groups = [];
-            for (const role of roles.values()) {
-                groups.push(role.name);
-            }
+            // const groups = [];
+            // for (const role of roles.values()) {
+            //     groups.push(role.name);
+            // }
             // for (const res of responseArr) {
             //     groups.push(matching.closestMatch(res, roleList));
             // }
@@ -294,14 +307,21 @@ module.exports = {
             console.log(groups);
             // return groups;
             let str = ``;
-            let n = 97;
+            // let n = 97;
+            // for (const group of groups) {
+            //     let char = String.fromCharCode(n);
+            //     if (n > 122) continue;
+            //     n++;
+            //     str = `
+            //     ${str}
+            //     :regional_indicator_${char}: ${group.name}`;
+            // }
+            let i = 1;
             for (const group of groups) {
-                let char = String.fromCharCode(n);
-                if (n > 122) continue;
-                n++;
                 str = `
                 ${str}
-                :regional_indicator_${char}: ${group}`;
+                ${emojies[i]} - ${group.name}`;
+                i++
             }
             if (!str) str = `\u200b`;
             const groupsEmbed = {
@@ -321,7 +341,24 @@ module.exports = {
             const actGroups = new MessageActionRow()
                 .addComponents(buttons.get(`addGroup`))
                 .addComponents(buttons.get(`finishGroups`));
-            user.send({ embeds: [groupsEmbed], components: [actGroups] });
+            const msg = await user.send({ embeds: [groupsEmbed], components: [actGroups] });
+            for (let n = 1; n < i; n++) {
+                msg.react(emojies[n]);
+            }
+            // const reaction = getReaction(msg, i);
+            // console.log(reaction);
+            const filter = (reaction, user) => true;
+            const collector = msg.createReactionCollector({ filter });
+            collector.on(`collect`, (reaction, user) => {
+                console.log(`reaction`);
+                console.log(reaction);
+                console.log(`user`);
+                console.log(user);
+            });
+            collector.on(`end`, collected => {
+                console.log(`collected`);
+                console.log(collected);
+            });
         }
 
         // const date = new Date(str[0],str[1],str[2])
