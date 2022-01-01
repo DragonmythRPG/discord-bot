@@ -31,7 +31,7 @@ module.exports = {
             const index = info.players.indexOf(user.id);
             info.players.splice(index, 1)
             await database.set(group, info);
-            userDatabase.Group.upsert({ name: info.name, players: info.players.join(`;`) });
+            userDatabase.Group.upsert({ name: info.name, players: JSON.stringify(info.players) });
         }
         console.log(client.databases.groups);
 

@@ -28,7 +28,7 @@ module.exports = {
         if (!info.players.includes(user.id)) {
             info.players.push(user.id);
             await database.set(group, info);
-            userDatabase.Group.upsert({ name: info.name, players: info.players.join(`;`) });
+            userDatabase.Group.upsert({ name: info.name, players: JSON.stringify(info.players) });
         }
 
         // Edit earlier deferment.

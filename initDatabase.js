@@ -25,13 +25,14 @@ async function runSequelize() {
     } catch (error) {
         console.error('Unable to connect to the database:', error);
     }
-    const promiseGroup = Group.sync().then(async function() {
+    const promiseGroup = Group.sync({ force: true }).then(async function() {
         const groups = await Group.findAll();
         client.databases.groups = new Collection();
         for (const group of groups) {
             if (group.players == null) await group.destroy();
             console.log(group.players.split(`;`));
-            const players = (group.players.split(`;`)[0] == ``) ? [] : group.players.split(`;`);
+            const players = JSON.parse(group.players);
+            // const players = (group.players.split(`;`)[0] == ``) ? [] : group.players.split(`;`);
             console.log(players);
             client.databases.groups.set(group.name, { name: group.name, players: players });
         }

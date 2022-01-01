@@ -29,9 +29,7 @@ module.exports = {
         }
         if (taken) return false;
         await database.set(group, { name: group, players: [] });
-        const upload = client.databases.groups.get(group);
-        console.log(upload);
-        upload.players = upload.players.join(`;`);
+        const upload = { name: group, players: `[]` };
         console.log(upload);
         userDatabase.Group.upsert(upload);
 
