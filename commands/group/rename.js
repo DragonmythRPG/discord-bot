@@ -35,25 +35,6 @@ module.exports = {
             }
         });
 
-        // interaction.guild.commands.fetch()
-        //     .then(commands => {
-        //         let appComArr = [];
-        //         for (const command of commands.values()) {
-        //             for (const opt of command.options) {
-        //                 if (!opt.options) continue;
-        //                 for (const choice of opt.options) {
-        //                     if (choice.name != `group`) continue;
-        //                     if (!Array.isArray(choice.choices)) choice.choices = [];
-        //                     console.log(choice);
-        //                     choice.choices.push({ name: group, value: group });
-        //                     console.log(choice);
-        //                 }
-        //             }
-        //             appComArr.push(command);
-        //         }
-        //         interaction.guild.commands.set(appComArr);
-        //     }).then(interaction.editReply(`Created ${group} and added it to the database.`));
-
         for (const command of client.appCommands.values()) {
             for (const opt of command.options) {
                 if (!opt.options) continue;

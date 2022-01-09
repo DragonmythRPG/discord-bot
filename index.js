@@ -28,6 +28,9 @@ client = new Client({
     ],
 });
 client.commands = new Collection();
+client.appCommands = new Collection();
+client.reactionRoles = new Collection();
+client.databases = {};
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {

@@ -16,7 +16,7 @@ module.exports = {
             database.set(target.id, { userID: target.id, userName: target.username, userXP: value })
             data = database.get(target.id);
         }
-        userDatabase.updateUser(interaction.client, target);
+        userDatabase.User.upsert(client.databases.users.get(target.id));
         interaction.reply(`Added ${value} XP to <@!${target.id}>. They now have ${database.get(target.id).userXP} XP.`);
     },
 };

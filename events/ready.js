@@ -10,7 +10,6 @@ module.exports = {
     once: true,
     async execute(client) {
         if (debug) {
-            client.databases = {};
             await userDatabase.runSequelize(client);
             // commands.registerCommands();
             buttons.registerButtons();

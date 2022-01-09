@@ -20,6 +20,15 @@ module.exports = {
     },
     getDate,
     getTime,
+    fix,
+}
+
+function fix(num, length = 2) {
+    num = `${num}`;
+    while (num.size < length) {
+        num = `0${num}`
+    }
+    return num;
 }
 
 function getDate(response) {
@@ -49,7 +58,7 @@ function getDate(response) {
     dateFormats.forEach(format => {
         if (format.reg.test(response)) formatted = format;
     });
-    if (!formatted) return getDate(true);
+    if (!formatted) return false;
     let final = {}
     const a = formatted.name.split("-");
     const b = response.split(/[-,. \/]+/);

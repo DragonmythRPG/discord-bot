@@ -25,7 +25,7 @@ async function runSequelize() {
     } catch (error) {
         console.error('Unable to connect to the database:', error);
     }
-    const promiseGroup = Group.sync({ force: true }).then(async function() {
+    const promiseGroup = Group.sync().then(async function() {
         const groups = await Group.findAll();
         client.databases.groups = new Collection();
         for (const group of groups) {
@@ -34,7 +34,7 @@ async function runSequelize() {
             const players = JSON.parse(group.players);
             // const players = (group.players.split(`;`)[0] == ``) ? [] : group.players.split(`;`);
             console.log(players);
-            client.databases.groups.set(group.name, { name: group.name, players: players });
+            client.databases.groups.set(group.id, { id: group.id, name: group.name, players: players });
         }
     });
     const promiseUser = User.sync().then(async function() {

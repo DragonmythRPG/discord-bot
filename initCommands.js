@@ -15,7 +15,6 @@ let rest;
 let appCommands;
 
 async function registerCommands() {
-    client.appCommands = new Collection();
     const commands = [];
     for (const file of commandFiles) {
         const command = require(`./commands/${file}`);

@@ -24,7 +24,7 @@ module.exports = {
         for (const val of database.values()) {
             if (val.name == group) {
                 taken = true;
-                interaction.reply({ content: `This group name is already taken. Please attempt again with a different name.`, ephemeral: true })
+                interaction.reply({ content: `This group name is already taken. Please attempt again with a different name.`, ephemeral: true });
             }
         }
         if (taken) return false;
